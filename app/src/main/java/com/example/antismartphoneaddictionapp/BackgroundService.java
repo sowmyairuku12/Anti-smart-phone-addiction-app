@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.antismartphoneaddictionapp.Models.LocalAppModel;
+import com.example.antismartphoneaddictionapp.Models.RestrictedAppModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -101,7 +102,7 @@ public class BackgroundService extends Service {
             }
         };
         timer = new Timer();
-        timer.schedule(timerTask, 0, 20000);  // 20 seconds interval
+        timer.schedule(timerTask, 0, 5000);  // 5 seconds interval
     }
 
     private void startForegroundService() {
@@ -194,8 +195,8 @@ public class BackgroundService extends Service {
 
     void showList() {
         for (UsageStats pkgStats : mPackageStats) {
-//            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > 300000) { // 5 minutes
-            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > 7200000) { // 120 minutes
+            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > 120000) { // 5 minutes
+//            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > 7200000) { // 120 minutes
                 String appName = mAppLabelMap.get(pkgStats.getPackageName()).toUpperCase();
                 List<LocalAppModel> appModels = db.getAllApps();
                 boolean shouldNotify = true;
@@ -210,10 +211,34 @@ public class BackgroundService extends Service {
 
                 if (shouldNotify) {
                     showNotification("Over Usage Detected", "Please stop using " + appName);
+
+                    // Creating RestrictedAppModel with current data
+                    RestrictedAppModel restrictedAppModel = new RestrictedAppModel();
+                    restrictedAppModel.setPackageName(pkgStats.getPackageName());
+                    restrictedAppModel.setDate(getFormattedDate());
+                    restrictedAppModel.setTime(getFormattedTime());
+                    restrictedAppModel.setExpiryTime(getExpiryTime()); // You may define the expiry time logic
+
+                    // Add restricted app to the database
+                    db.addRestrictedApp(restrictedAppModel);
+
+
                     db.addApp(new LocalAppModel(pkgStats.getPackageName(), getFormattedDate()));
                 }
             }
         }
+    }
+
+    private String getFormattedTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
+    private String getExpiryTime() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR, 1);  // Set expiry time to 1 hours from now
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        return sdf.format(calendar.getTime());
     }
 
     public static String getFormattedDate() {
