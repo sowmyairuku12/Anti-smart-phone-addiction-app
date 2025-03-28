@@ -82,22 +82,27 @@ public class MainActivity extends AppCompatActivity {
             mUsageStatsManager = (UsageStatsManager) getSystemService("usagestats");
         }
 
-
         askPermission();
 
         long hour_in_mil = 1000 * 60 * 60; // In Milliseconds
         long end_time = System.currentTimeMillis();
         long start_time = end_time - hour_in_mil;
 
-
-
         Intent serviceIntent = new Intent(this, BackgroundService.class);
         ContextCompat.startForegroundService(this, serviceIntent);
     }
 
+    //    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        getUsage();
+//        showList();
+//    }
     @Override
     protected void onResume() {
         super.onResume();
+        mPackageStats.clear();  // Clear the old package stats to avoid duplication
+        appModelArrayList.clear();  // Clear the list to prevent old data from staying
         getUsage();
         showList();
     }
@@ -149,13 +154,16 @@ public class MainActivity extends AppCompatActivity {
         }
         mPackageStats.addAll(map.values());
         mAppLabelComparator = new AppNameComparator(mAppLabelMap);
-
     }
 
     @SuppressLint("SetTextI18n")
     void showList() {
         mPm = getApplication().getPackageManager();
         long totalTimeList = 0;
+
+        //Clear the existing List to avoid the duplication after the app is re-opened
+        appModelArrayList.clear();
+
         for (int i = 0; i < mPackageStats.size(); i++) {
             UsageStats pkgStats = mPackageStats.get(i);
             if (pkgStats != null) {
@@ -178,5 +186,4 @@ public class MainActivity extends AppCompatActivity {
         appListRV.setAdapter(appointmentAdaptor);
         totalTime.setText(DateUtils.formatElapsedTime(totalTimeList / 1000) + " Hours");
     }
-
 }
