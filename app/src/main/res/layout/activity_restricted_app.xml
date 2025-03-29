@@ -36,6 +36,36 @@
             android:textSize="22sp"
             tools:ignore="HardcodedText" />
 
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:inputType="number"
+            android:padding="10dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textCursorDrawable="@color/white"
+            app:boxStrokeColor="@color/white"
+            app:boxStrokeWidth="2dp"
+            app:hintTextColor="@color/white">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter Phone Number"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:textCursorDrawable="@color/white"
+                tools:ignore="HardcodedText">
+
+                <requestFocus />
+            </com.google.android.material.textfield.TextInputEditText>
+        </com.google.android.material.textfield.TextInputLayout>
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnGetOTP"
             android:layout_width="match_parent"
@@ -48,29 +78,33 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/ilOPT"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:hint="Enter OPT"
+            android:layout_marginTop="16dp"
+            android:inputType="number"
             android:padding="10dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textCursorDrawable="@color/white"
             app:boxStrokeColor="@color/white"
             app:boxStrokeWidth="2dp"
             app:hintTextColor="@color/white"
             android:visibility="gone">
 
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etOpt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/mainColor"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:textColor="@color/white"
+                android:hint="Enter OPT"
+                android:importantForAutofill="no"
                 android:inputType="number"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
                 android:textCursorDrawable="@color/white"
-                android:textColorHint="@color/white">
-                <requestFocus />
+                tools:ignore="HardcodedText">
+
             </com.google.android.material.textfield.TextInputEditText>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -83,8 +117,8 @@
             android:padding="5dp"
             android:text="Okay"
             android:textSize="19sp"
-            tools:ignore="HardcodedText"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
 </RelativeLayout>

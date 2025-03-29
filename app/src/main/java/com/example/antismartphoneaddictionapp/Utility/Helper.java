@@ -20,6 +20,7 @@ public class Helper {
             return 0;
         }
     }
+
     public static double getLongValueFromString(String value) {
         try {
             return Long.parseLong(value);
@@ -27,6 +28,7 @@ public class Helper {
             return 0;
         }
     }
+
     public static String getStringFromInput(View view) {
         try {
             if (view instanceof TextInputEditText) {
@@ -121,4 +123,50 @@ public class Helper {
         return isValidate;
     }
 
+    public static boolean isContactValid(View contactView) {
+        boolean isValidate = true;
+        try {
+            TextInputLayout textInputLayout = null;
+            ViewParent parent = contactView.getParent().getParent();
+            if (parent instanceof TextInputLayout) {
+                textInputLayout = (TextInputLayout) parent;
+            }
+
+            String contactText = "";
+            if (contactView instanceof TextInputEditText) {
+                contactText = Objects.requireNonNull(((TextInputEditText) contactView).getText()).toString().trim();
+            } else if (contactView instanceof MaterialAutoCompleteTextView) {
+                contactText = Objects.requireNonNull(((MaterialAutoCompleteTextView) contactView).getText()).toString().trim();
+            }
+
+            // Regex for validating contact (Assuming 10-digit phone number)
+            if (!contactText.matches("^[0-9]{10}$")) {
+                if (textInputLayout != null) {
+                    textInputLayout.setError("Invalid Contact Number");
+                    textInputLayout.setErrorEnabled(true);
+                } else {
+                    if (contactView instanceof TextInputEditText) {
+                        ((TextInputEditText) contactView).setError("Invalid Contact Number");
+                    } else if (contactView instanceof MaterialAutoCompleteTextView) {
+                        ((MaterialAutoCompleteTextView) contactView).setError("Invalid Contact Number");
+                    }
+                }
+                isValidate = false;
+            } else {
+                if (textInputLayout != null) {
+                    textInputLayout.setErrorEnabled(false);
+                } else {
+                    if (contactView instanceof TextInputEditText) {
+                        ((TextInputEditText) contactView).setError(null);
+                    } else if (contactView instanceof MaterialAutoCompleteTextView) {
+                        ((MaterialAutoCompleteTextView) contactView).setError(null);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e("ValidationHelper", "Error in contact validation: ", e);
+            isValidate = false;
+        }
+        return isValidate;
+    }
 }
