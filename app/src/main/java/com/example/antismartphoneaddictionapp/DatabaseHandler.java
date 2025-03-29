@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.antismartphoneaddictionapp.Models.LocalAppModel;
 import com.example.antismartphoneaddictionapp.Models.RestrictedAppModel;
+import com.example.antismartphoneaddictionapp.Utility.Constants;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -157,7 +158,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // Get current time and add 2 minutes for the temporary unlock expiry time
         long currentTimeMillis = System.currentTimeMillis();
-        long tempUnlockExpiryTime = currentTimeMillis + (2 * 60 * 1000);  // Add 2 minutes (in milliseconds)
+        long tempUnlockExpiryTime = currentTimeMillis + (Constants.TEMP_EXPIRY_TIME);  // Add 2 minutes (in milliseconds)
 
         // Format the time to "yyyy-MM-dd HH:mm:ss" format
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());

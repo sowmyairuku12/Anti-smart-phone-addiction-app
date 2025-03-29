@@ -218,7 +218,6 @@ public class BackgroundService extends Service {
                     restrictedAppModel.setDate(getFormattedDate());
                     restrictedAppModel.setTime(getFormattedTime());
                     restrictedAppModel.setExpiryTime(getExpiryTime());  // You may define the expiry time logic
-//                   restrictedAppModel.setTempUnlockExpiryTime();
                     db.addRestrictedApp(restrictedAppModel);    // Add restricted app to the database
 
                     db.addApp(new LocalAppModel(pkgStats.getPackageName(), getFormattedDate()));
@@ -234,7 +233,7 @@ public class BackgroundService extends Service {
 
     private String getExpiryTime() {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR, 2);  // Set expiry time to 1 hours from now
+        calendar.add(Calendar.HOUR, Constants.EXPIRY_TIME);  // Set expiry time to 1 hours from now
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         return sdf.format(calendar.getTime());
     }

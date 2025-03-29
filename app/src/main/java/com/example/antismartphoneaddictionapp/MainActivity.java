@@ -2,6 +2,7 @@ package com.example.antismartphoneaddictionapp;
 
 import android.annotation.SuppressLint;
 import android.app.AppOpsManager;
+import android.app.Dialog;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
@@ -15,6 +16,9 @@ import android.provider.Settings;
 import android.text.format.DateUtils;
 import android.util.ArrayMap;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +30,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.antismartphoneaddictionapp.Adaptor.AppAdaptor;
+import com.example.antismartphoneaddictionapp.Dialog.AlertCustomTimeSettingsDialog;
 import com.example.antismartphoneaddictionapp.Models.AppModel;
+import com.example.antismartphoneaddictionapp.Utility.Constants;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -47,12 +53,15 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView appListRV;
     TextView totalTime;
 
+    private Dialog dialog;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initUI();
+        initObj();
     }
 
     public static class AppNameComparator implements Comparator<UsageStats> {
@@ -72,7 +81,10 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("WrongConstant")
     private void initUI() {
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
+
+        // Load stored values when the app starts
+        Constants.init(this);
 
         appListRV = findViewById(R.id.appListRV);
         totalTime = findViewById(R.id.totalTime);
@@ -93,6 +105,29 @@ public class MainActivity extends AppCompatActivity {
 
         Intent serviceIntent = new Intent(this, BackgroundService.class);
         ContextCompat.startForegroundService(this, serviceIntent);
+    }
+
+    private void initObj() {
+        context = this;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu); // Inflate the menu
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_settings) {
+            // Handle the Settings menu item click
+            // Open Profile dialog
+            dialog = new AlertCustomTimeSettingsDialog(context)
+                    .openProfileDialog();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     //    @Override
