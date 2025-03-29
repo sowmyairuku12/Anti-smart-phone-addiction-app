@@ -102,7 +102,7 @@ public class BackgroundService extends Service {
             }
         };
         timer = new Timer();
-        timer.schedule(timerTask, 0, 5000);  // 5 seconds interval
+        timer.schedule(timerTask, 0, 1000);  // 1 seconds interval
     }
 
     private void startForegroundService() {
