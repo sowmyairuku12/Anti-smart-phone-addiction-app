@@ -25,6 +25,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.antismartphoneaddictionapp.Models.LocalAppModel;
 import com.example.antismartphoneaddictionapp.Models.RestrictedAppModel;
+import com.example.antismartphoneaddictionapp.Utility.Constants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -193,7 +194,7 @@ public class BackgroundService extends Service {
 
     void showList() {
         for (UsageStats pkgStats : mPackageStats) {
-            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > 300000) { // 5 minutes
+            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > Constants.FOREGROUND_CHECK_TIME) { // 5 minutes
 //            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > 7200000) { // 120 minutes
                 String appName = mAppLabelMap.get(pkgStats.getPackageName()).toUpperCase();
                 List<LocalAppModel> appModels = db.getAllApps();

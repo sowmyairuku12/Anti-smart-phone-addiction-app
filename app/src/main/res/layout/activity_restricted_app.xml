@@ -11,19 +11,67 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/tvAppName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="22sp"
-            android:textColor="@color/white"
             android:text="app name is restricted"
             android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="22sp"
             tools:ignore="HardcodedText" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="Get opt to unlock app"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            tools:ignore="HardcodedText" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnGetOTP"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:padding="5dp"
+            android:text="Get OTP"
+            android:textSize="19sp"
+            tools:ignore="HardcodedText" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/ilOPT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="Enter OPT"
+            android:padding="10dp"
+            app:boxStrokeColor="@color/white"
+            app:boxStrokeWidth="2dp"
+            app:hintTextColor="@color/white"
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/mainColor"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:textColor="@color/white"
+                android:textCursorDrawable="@color/white"
+                android:textColorHint="@color/white">
+                <requestFocus />
+            </com.google.android.material.textfield.TextInputEditText>
+        </com.google.android.material.textfield.TextInputLayout>
+
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnOk"
@@ -34,7 +82,7 @@
             android:text="Okay"
             android:textSize="19sp"
             tools:ignore="HardcodedText"
-            />
+            android:visibility="gone"/>
     </LinearLayout>
 
 </RelativeLayout>
