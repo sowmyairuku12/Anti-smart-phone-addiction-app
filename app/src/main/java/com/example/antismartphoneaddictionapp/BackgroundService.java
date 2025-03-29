@@ -26,6 +26,7 @@ import androidx.core.app.NotificationCompat;
 import com.example.antismartphoneaddictionapp.Models.LocalAppModel;
 import com.example.antismartphoneaddictionapp.Models.RestrictedAppModel;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -55,7 +56,6 @@ import java.util.*;
 
 public class BackgroundService extends Service {
     public static final String CHANNEL_ID = "usage_notification_channel";
-
     private Handler handler = new Handler();
     private Timer timer;
     private TimerTask timerTask;
@@ -69,7 +69,6 @@ public class BackgroundService extends Service {
 
     public static class AppNameComparator implements Comparator<UsageStats> {
         private Map<String, String> mAppLabelList;
-
         AppNameComparator(Map<String, String> appList) {
             mAppLabelList = appList;
         }
@@ -98,6 +97,7 @@ public class BackgroundService extends Service {
                     Log.d("TAG", "Background service running...");
                     getUsage();
                     showList();
+                    checkForegroundApp(); // New method to check and restrict app usage
                 });
             }
         };
@@ -118,7 +118,6 @@ public class BackgroundService extends Service {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build();
-
         startForeground(123, notification);
         Log.d("TAG", "Foreground Service Started");
     }
@@ -164,7 +163,6 @@ public class BackgroundService extends Service {
         nm.notify(randomId, builder.build());
     }
 
-
     void getUsage() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -1);
@@ -195,7 +193,7 @@ public class BackgroundService extends Service {
 
     void showList() {
         for (UsageStats pkgStats : mPackageStats) {
-            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > 120000) { // 5 minutes
+            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > 300000) { // 5 minutes
 //            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > 7200000) { // 120 minutes
                 String appName = mAppLabelMap.get(pkgStats.getPackageName()).toUpperCase();
                 List<LocalAppModel> appModels = db.getAllApps();
@@ -217,12 +215,8 @@ public class BackgroundService extends Service {
                     restrictedAppModel.setPackageName(pkgStats.getPackageName());
                     restrictedAppModel.setDate(getFormattedDate());
                     restrictedAppModel.setTime(getFormattedTime());
-                    restrictedAppModel.setExpiryTime(getExpiryTime()); // You may define the expiry time logic
-
-                    // Add restricted app to the database
-                    db.addRestrictedApp(restrictedAppModel);
-
-
+                    restrictedAppModel.setExpiryTime(getExpiryTime());  // You may define the expiry time logic
+                    db.addRestrictedApp(restrictedAppModel);    // Add restricted app to the database
                     db.addApp(new LocalAppModel(pkgStats.getPackageName(), getFormattedDate()));
                 }
             }
@@ -236,13 +230,76 @@ public class BackgroundService extends Service {
 
     private String getExpiryTime() {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR, 1);  // Set expiry time to 1 hours from now
+        calendar.add(Calendar.HOUR, 2);  // Set expiry time to 1 hours from now
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         return sdf.format(calendar.getTime());
     }
 
     public static String getFormattedDate() {
         return new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Calendar.getInstance().getTime());
+    }
+
+    void checkForegroundApp() {
+        String foregroundApp = getForegroundApp();
+        if (foregroundApp == null || foregroundApp.equalsIgnoreCase("com.miui.home")
+        || foregroundApp.equalsIgnoreCase("com.example.antismartphoneaddictionapp")) {
+            return; // Ignore if it's the home screen
+        }
+        List<RestrictedAppModel> restrictedApps = db.getAllRestrictedApps();  // Fetch all restricted apps
+        for (RestrictedAppModel app : restrictedApps) {
+            if (foregroundApp.equalsIgnoreCase(app.getPackageName()) &&
+                    System.currentTimeMillis() < parseTime(app.getExpiryTime())) {
+
+                Log.d("TAG", "Restricted App Detected: " + foregroundApp);
+                showNotification("Restricted App Blocked", "You are not allowed to use " + foregroundApp);
+                launchAntiSmartphoneAddictionApp(); // Launch your app
+                break;
+            }
+        }
+    }
+
+    String getForegroundApp() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+            long endTime = System.currentTimeMillis();
+            long beginTime = endTime - 5000; // Last 5 seconds
+
+            List<UsageStats> stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, beginTime, endTime);
+            if (stats != null) {
+                UsageStats recentStats = null;
+                for (UsageStats usageStats : stats) {
+                    if (recentStats == null || usageStats.getLastTimeUsed() > recentStats.getLastTimeUsed()) {
+                        recentStats = usageStats;
+                    }
+                }
+                if (recentStats != null) {
+                    return recentStats.getPackageName();
+                }
+            }
+        }
+        return null;
+    }
+
+    void launchAntiSmartphoneAddictionApp() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+//        Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+//        homeIntent.addCategory(Intent.CATEGORY_HOME);
+//        homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(homeIntent);
+
+    }
+
+    long parseTime(String expiryTime) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            Date date = sdf.parse(expiryTime);
+            return date != null ? date.getTime() : 0;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     @Override

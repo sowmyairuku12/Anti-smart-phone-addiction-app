@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -15,8 +16,10 @@ import android.text.format.DateUtils;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -107,21 +110,59 @@ public class MainActivity extends AppCompatActivity {
         showList();
     }
 
+    //    void askPermission() {
+//        boolean granted = false;
+//        AppOpsManager appOps = (AppOpsManager) this
+//                .getSystemService(Context.APP_OPS_SERVICE);
+//        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+//                android.os.Process.myUid(), this.getPackageName());
+//
+//        if (mode == AppOpsManager.MODE_DEFAULT) {
+//            granted = (this.checkCallingOrSelfPermission(android.Manifest.permission.PACKAGE_USAGE_STATS) == PackageManager.PERMISSION_GRANTED);
+//        } else {
+//            granted = (mode == AppOpsManager.MODE_ALLOWED);
+//        }
+//
+//        if (!granted) {
+//            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+//        }
+//    }
     void askPermission() {
-        boolean granted = false;
-        AppOpsManager appOps = (AppOpsManager) this
-                .getSystemService(Context.APP_OPS_SERVICE);
+        AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
-                android.os.Process.myUid(), this.getPackageName());
+                android.os.Process.myUid(), getPackageName());
 
-        if (mode == AppOpsManager.MODE_DEFAULT) {
-            granted = (this.checkCallingOrSelfPermission(android.Manifest.permission.PACKAGE_USAGE_STATS) == PackageManager.PERMISSION_GRANTED);
-        } else {
-            granted = (mode == AppOpsManager.MODE_ALLOWED);
+        boolean usageAccessGranted = (mode == AppOpsManager.MODE_ALLOWED);
+        boolean overlayPermissionGranted = Settings.canDrawOverlays(this);
+
+        if (!usageAccessGranted) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Permission Required")
+                    .setMessage("This app needs Usage Access permission to monitor app usage.")
+                    .setPositiveButton("Grant", (dialog, which) -> {
+                        startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                    })
+                    .setCancelable(false)
+                    .show();
         }
 
-        if (!granted) {
-            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+        if (!overlayPermissionGranted) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Overlay Permission Required")
+                    .setMessage("This app needs permission to display a warning screen over restricted apps.")
+                    .setPositiveButton("Grant", (dialog, which) -> {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        Toast.makeText(this, "Overlay permission denied", Toast.LENGTH_SHORT).show();
+                    })
+                    .setCancelable(false)
+                    .show();
         }
     }
 
