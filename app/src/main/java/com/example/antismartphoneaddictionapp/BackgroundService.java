@@ -70,6 +70,7 @@ public class BackgroundService extends Service {
 
     public static class AppNameComparator implements Comparator<UsageStats> {
         private Map<String, String> mAppLabelList;
+
         AppNameComparator(Map<String, String> appList) {
             mAppLabelList = appList;
         }
@@ -217,7 +218,9 @@ public class BackgroundService extends Service {
                     restrictedAppModel.setDate(getFormattedDate());
                     restrictedAppModel.setTime(getFormattedTime());
                     restrictedAppModel.setExpiryTime(getExpiryTime());  // You may define the expiry time logic
+//                   restrictedAppModel.setTempUnlockExpiryTime();
                     db.addRestrictedApp(restrictedAppModel);    // Add restricted app to the database
+
                     db.addApp(new LocalAppModel(pkgStats.getPackageName(), getFormattedDate()));
                 }
             }
@@ -243,19 +246,45 @@ public class BackgroundService extends Service {
     void checkForegroundApp() {
         String foregroundApp = getForegroundApp();
         if (foregroundApp == null || foregroundApp.equalsIgnoreCase("com.miui.home")
-        || foregroundApp.equalsIgnoreCase("com.example.antismartphoneaddictionapp")) {
-            return; // Ignore if it's the home screen
+                || foregroundApp.equalsIgnoreCase("com.example.antismartphoneaddictionapp")) {
+            return; // Ignore if it's the home screen, or AntiSmartPhoneAddictionApp
         }
+//        here also check time for temporary unload time keep the logic for expiry time as it is if unload time is remaining then app must be unlocked for that time
         List<RestrictedAppModel> restrictedApps = db.getAllRestrictedApps();  // Fetch all restricted apps
-        for (RestrictedAppModel app : restrictedApps) {
-            if (foregroundApp.equalsIgnoreCase(app.getPackageName()) &&
-                    System.currentTimeMillis() < parseTime(app.getExpiryTime())) {
+        for (RestrictedAppModel app : restrictedApps) { //        // Check if temporary unlock time is still valid
+//            if (foregroundApp.equalsIgnoreCase(app.getPackageName()) &&
+//                    System.currentTimeMillis() < parseTime(app.getExpiryTime())) {
+//
+//                Log.d("TAG", "Restricted App Detected: " + foregroundApp);
+//                String appName = mAppLabelMap.get(foregroundApp); // Get the app's user-friendly name
+//                showNotification("Restricted App Blocked", "You are not allowed to use " + foregroundApp);
+//                launchAntiSmartphoneAddictionApp(appName, app.getPackageName(), app.getId()); // Launch your app
+//                break;
+//            }
 
-                Log.d("TAG", "Restricted App Detected: " + foregroundApp);
-                String appName = mAppLabelMap.get(foregroundApp); // Get the app's user-friendly name
-                showNotification("Restricted App Blocked", "You are not allowed to use " + foregroundApp);
-                launchAntiSmartphoneAddictionApp(appName); // Launch your app
-                break;
+            // Check if temporary unlock time is still valid
+            if (foregroundApp.equalsIgnoreCase(app.getPackageName())) {
+                long currentTime = System.currentTimeMillis();
+
+                // Check if tempUnlockExpiryTime is not null or empty before parsing
+                String tempUnlockExpiryTimeStr = app.getTempUnlockExpiryTime();
+                if (tempUnlockExpiryTimeStr != null && !tempUnlockExpiryTimeStr.isEmpty()) {
+                    long tempUnlockExpiryTime = parseTime(tempUnlockExpiryTimeStr);
+                    if (currentTime < tempUnlockExpiryTime) {
+                        // Allow access to the app until the unlock time expires
+                        return;
+                    }
+                }
+
+                // If it's not temporarily unlocked, check the normal expiry time
+                long expiryTime = parseTime(app.getExpiryTime());
+                if (currentTime < expiryTime) {
+                    Log.d("TAG", "Restricted App Detected: " + foregroundApp);
+                    String appName = mAppLabelMap.get(foregroundApp); // Get the app's user-friendly name
+                    showNotification("Restricted App Blocked", "You are not allowed to use " + foregroundApp);
+                    launchAntiSmartphoneAddictionApp(appName, app.getPackageName(), app.getId());
+                    break;
+                }
             }
         }
     }
@@ -282,10 +311,12 @@ public class BackgroundService extends Service {
         return null;
     }
 
-    void launchAntiSmartphoneAddictionApp(String appName) {
+    void launchAntiSmartphoneAddictionApp(String appName, String packageName, int appId) {
         Intent intent = new Intent(this, RestrictedAppActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("APP_NAME", appName); // Pass the app name
+        intent.putExtra("PACKAGE_NAME", packageName);  // Pass the package name
+        intent.putExtra("APP_ID", appId);  // Pass the app ID
         startActivity(intent);
 //        Intent homeIntent = new Intent(Intent.ACTION_MAIN); //to launch the Home of device
 //        homeIntent.addCategory(Intent.CATEGORY_HOME);

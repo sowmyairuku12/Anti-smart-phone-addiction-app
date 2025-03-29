@@ -9,6 +9,7 @@ public class RestrictedAppModel implements Serializable {
     private String date;
     private String time;
     private String expiryTime;
+    private String tempUnlockExpiryTime; // New field
 
     public RestrictedAppModel() {
     }
@@ -60,4 +61,11 @@ public class RestrictedAppModel implements Serializable {
         this.expiryTime = expiryTime;
     }
 
+    public String getTempUnlockExpiryTime() {
+        return tempUnlockExpiryTime;
+    }
+
+    public void setTempUnlockExpiryTime(String tempUnlockExpiryTime) {
+        this.tempUnlockExpiryTime = tempUnlockExpiryTime;
+    }
 }

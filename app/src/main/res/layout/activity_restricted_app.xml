@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
-            android:text="Get opt to unlock app"
+            android:text="Get opt to unlock app :"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="22sp"
@@ -60,12 +60,14 @@
             android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etOpt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/mainColor"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:textColor="@color/white"
+                android:inputType="number"
                 android:textCursorDrawable="@color/white"
                 android:textColorHint="@color/white">
                 <requestFocus />

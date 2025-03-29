@@ -9,7 +9,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.example.antismartphoneaddictionapp.Models.LocalAppModel;
 import com.example.antismartphoneaddictionapp.Models.RestrictedAppModel;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -28,6 +31,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_RESTRICTED_DATE = "date";
     private static final String KEY_RESTRICTED_TIME = "time";
     private static final String KEY_RESTRICTED_EXPIRY_TIME = "expiryTime";
+    private static final String KEY_TEMP_UNLOCK_EXPIRY_TIME = "tempUnlockExpiryTime";
+
 
 
     public DatabaseHandler(Context context) {
@@ -46,9 +51,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_RESTRICTED_PACKAGE_NAME + " TEXT,"
                 + KEY_RESTRICTED_DATE + " TEXT,"
                 + KEY_RESTRICTED_TIME + " TEXT,"
-                + KEY_RESTRICTED_EXPIRY_TIME + " TEXT" + ")";
+                + KEY_RESTRICTED_EXPIRY_TIME + " TEXT,"
+                + KEY_TEMP_UNLOCK_EXPIRY_TIME +" TEXT" + ")";  // New column
         db.execSQL(CREATE_RESTRICTED_APPS_TABLE);
-
 
         db.execSQL(CREATE_APP_TABLE);
     }
@@ -109,8 +114,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    //NEW
-    // Method to add a restricted app
+    //NEW Methods to add a restricted app
     void addRestrictedApp(RestrictedAppModel appModel) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -119,6 +123,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_RESTRICTED_DATE, appModel.getDate());
         values.put(KEY_RESTRICTED_TIME, appModel.getTime());
         values.put(KEY_RESTRICTED_EXPIRY_TIME, appModel.getExpiryTime());
+        values.put(KEY_TEMP_UNLOCK_EXPIRY_TIME, appModel.getTempUnlockExpiryTime());  // Add the new column
 
         db.insert(TABLE_RESTRICTED_APPS, null, values);
         db.close();
@@ -139,11 +144,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 appModel.setDate(cursor.getString(2));
                 appModel.setTime(cursor.getString(3));
                 appModel.setExpiryTime(cursor.getString(4));
+                appModel.setTempUnlockExpiryTime(cursor.getString(5));  // Fetch the new column
                 appModels.add(appModel);
             } while (cursor.moveToNext());
         }
         return appModels;
     }
+
+    // Method to update TempUnlockExpiryTime for a restricted app
+    public void updateTempUnlockExpiryTime(int appId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Get current time and add 2 minutes for the temporary unlock expiry time
+        long currentTimeMillis = System.currentTimeMillis();
+        long tempUnlockExpiryTime = currentTimeMillis + (2 * 60 * 1000);  // Add 2 minutes (in milliseconds)
+
+        // Format the time to "yyyy-MM-dd HH:mm:ss" format
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String formattedExpiryTime = sdf.format(new Date(tempUnlockExpiryTime));
+
+        // Update TempUnlockExpiryTime in the database for the app with the given ID
+        ContentValues values = new ContentValues();
+        values.put(KEY_TEMP_UNLOCK_EXPIRY_TIME, formattedExpiryTime);
+
+        // Update the restricted app record with the new TempUnlockExpiryTime
+        db.update(TABLE_RESTRICTED_APPS, values, KEY_RESTRICTED_ID + " = ?", new String[]{String.valueOf(appId)});
+        db.close();
+    }
+
 
     // Method to update a restricted app
     public int updateRestrictedApp(RestrictedAppModel appModel) {
@@ -154,6 +182,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_RESTRICTED_DATE, appModel.getDate());
         values.put(KEY_RESTRICTED_TIME, appModel.getTime());
         values.put(KEY_RESTRICTED_EXPIRY_TIME, appModel.getExpiryTime());
+        values.put(KEY_TEMP_UNLOCK_EXPIRY_TIME, appModel.getTempUnlockExpiryTime());
 
         return db.update(TABLE_RESTRICTED_APPS, values, KEY_RESTRICTED_ID + " = ?",
                 new String[]{String.valueOf(appModel.getId())});
@@ -166,5 +195,4 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[]{String.valueOf(appModel.getId())});
         db.close();
     }
-
 }
