@@ -251,8 +251,9 @@ public class BackgroundService extends Service {
                     System.currentTimeMillis() < parseTime(app.getExpiryTime())) {
 
                 Log.d("TAG", "Restricted App Detected: " + foregroundApp);
+                String appName = mAppLabelMap.get(foregroundApp); // Get the app's user-friendly name
                 showNotification("Restricted App Blocked", "You are not allowed to use " + foregroundApp);
-                launchAntiSmartphoneAddictionApp(); // Launch your app
+                launchAntiSmartphoneAddictionApp(appName); // Launch your app
                 break;
             }
         }
@@ -280,15 +281,15 @@ public class BackgroundService extends Service {
         return null;
     }
 
-    void launchAntiSmartphoneAddictionApp() {
-        Intent intent = new Intent(this, MainActivity.class);
+    void launchAntiSmartphoneAddictionApp(String appName) {
+        Intent intent = new Intent(this, RestrictedAppActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("APP_NAME", appName); // Pass the app name
         startActivity(intent);
-//        Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+//        Intent homeIntent = new Intent(Intent.ACTION_MAIN); //to launch the Home of device
 //        homeIntent.addCategory(Intent.CATEGORY_HOME);
 //        homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        startActivity(homeIntent);
-
     }
 
     long parseTime(String expiryTime) {
