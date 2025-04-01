@@ -31,7 +31,7 @@ public class AlertCustomTimeSettingsDialog implements View.OnClickListener {
         this.context = context;
     }
 
-    public Dialog openProfileDialog() {
+    public Dialog openCustomSettingsDialog() {
         try {
             try {
                 LayoutInflater layoutInflater = ((Activity) context).getLayoutInflater();
@@ -48,12 +48,12 @@ public class AlertCustomTimeSettingsDialog implements View.OnClickListener {
                 dialog = alertBuilder.create();
 
             } catch (Exception e) {
-                Log.e(TAG, "Error in AlertProfileDialog: ", e);
+                Log.e(TAG, "Error in openCustomSettingsDialog: ", e);
             }
 
             dialog.show();
         } catch (Exception e) {
-            Log.e(TAG, "Error in AlertProfileDialog: ", e);
+            Log.e(TAG, "Error in openCustomSettingsDialog: ", e);
         }
         return dialog;
     }
@@ -67,16 +67,15 @@ public class AlertCustomTimeSettingsDialog implements View.OnClickListener {
     }
 
     private void setData() {
-        etRestrictAppAfter.setText(String.valueOf(Constants.FOREGROUND_CHECK_TIME));
-        etExpiryTime.setText(String.valueOf(Constants.EXPIRY_TIME));
-        etTemporaryUnlockTime.setText(String.valueOf(Constants.TEMP_EXPIRY_TIME));
+        etRestrictAppAfter.setText(String.valueOf(Constants.FOREGROUND_CHECK_TIME / 3600000));  //Milliseconds → Hours
+        etExpiryTime.setText(String.valueOf(Constants.EXPIRY_TIME));  //In Hours
+        etTemporaryUnlockTime.setText(String.valueOf(Constants.TEMP_EXPIRY_TIME / 60000));  //Minutes → Milliseconds
     }
 
     private void setListeners() {
         btnCancel.setOnClickListener(this);
         btnUpdate.setOnClickListener(this);
     }
-
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -94,17 +93,24 @@ public class AlertCustomTimeSettingsDialog implements View.OnClickListener {
     private void onClickBtnUpdate() {
         View[] views = {etRestrictAppAfter, etExpiryTime, etTemporaryUnlockTime};
         if (Helper.isEmptyFieldValidation(views)) {
-            long restrictedAppAfter = Long.parseLong(Objects.requireNonNull(Helper.getStringFromInput(etRestrictAppAfter)));
-            int expiryTime = Integer.parseInt(Objects.requireNonNull(Helper.getStringFromInput(etExpiryTime)));
-            long tempLockTime = Long.parseLong(Objects.requireNonNull(Helper.getStringFromInput(etTemporaryUnlockTime)));
+            long restrictedAppAfterHours = Long.parseLong(Objects.requireNonNull(Helper.getStringFromInput(etRestrictAppAfter)));
+            long restrictedAppAfterMs = restrictedAppAfterHours * 3600000;    //Hours → Milliseconds
 
-            // Save values in SharedPreferences and update Constants
-            Constants.updateValues(context, restrictedAppAfter, expiryTime, tempLockTime);
+            int expiryTime = Integer.parseInt(Objects.requireNonNull(Helper.getStringFromInput(etExpiryTime)));
+            long tempLockTimeMinutes = Long.parseLong(Objects.requireNonNull(Helper.getStringFromInput(etTemporaryUnlockTime)));
+            long tempLockTimeMs = tempLockTimeMinutes * 60000;   //Minutes → Milliseconds
+
+//            Open AlertUpdateSettingsOPTDialog and call Constants.updateValues() there after opt is successfully validated
+            new AlertUpdateSettingsOTPDialog(context, restrictedAppAfterMs, expiryTime, tempLockTimeMs)
+                    .openUpdateSettingsDialog();
+
+            // Save values in SharedPreferences and update Constants value
+//            Constants.updateValues(context, restrictedAppAfterMs, expiryTime, tempLockTimeMs);
 
             // Close dialog
-            if (dialog != null && dialog.isShowing()) {
-                dialog.dismiss();
-            }
+//            if (dialog != null && dialog.isShowing()) {
+//                dialog.dismiss();
+//            }
         }
     }
 

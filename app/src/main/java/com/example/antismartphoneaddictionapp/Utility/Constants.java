@@ -8,9 +8,9 @@ public class Constants {
     private static final String PREF_NAME = "ANTISMARTPHONEADDICTION";
     private static SharedPreferences sharedPreferences;
 
-    public static long FOREGROUND_CHECK_TIME = 300000; // 5 minutes in milliseconds
-    public static int EXPIRY_TIME = 2; // 2 Hours
-    public static long TEMP_EXPIRY_TIME = 120000; //2 minutes
+    public static long FOREGROUND_CHECK_TIME = 7200000; // 2 hours default
+    public static int EXPIRY_TIME = 2; // 2 Hours default
+    public static long TEMP_EXPIRY_TIME = 120000; //2 minutes default  //300000 (5 minutes)
 
     public static final long OPT = 1234;
 
@@ -19,7 +19,7 @@ public class Constants {
         sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
         // Load saved values or use default ones
-        FOREGROUND_CHECK_TIME = sharedPreferences.getLong("FOREGROUND_CHECK_TIME", 300000);
+        FOREGROUND_CHECK_TIME = sharedPreferences.getLong("FOREGROUND_CHECK_TIME", 7200000);
         EXPIRY_TIME = sharedPreferences.getInt("EXPIRY_TIME", 2);
         TEMP_EXPIRY_TIME = sharedPreferences.getLong("TEMP_EXPIRY_TIME", 120000);
     }

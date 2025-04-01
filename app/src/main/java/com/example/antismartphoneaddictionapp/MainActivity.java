@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) { //adding settings menu for updating settings
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu); // Inflate the menu
         return true;
@@ -122,9 +122,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_settings) {
             // Handle the Settings menu item click
-            // Open Profile dialog
             dialog = new AlertCustomTimeSettingsDialog(context)
-                    .openProfileDialog();
+                    .openCustomSettingsDialog();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -136,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
 //        getUsage();
 //        showList();
 //    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         boolean usageAccessGranted = (mode == AppOpsManager.MODE_ALLOWED);
         boolean overlayPermissionGranted = Settings.canDrawOverlays(this);
 
-        if (!usageAccessGranted) {
+        if (!usageAccessGranted) { //for getting information about apps usage timings
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Permission Required")
                     .setMessage("This app needs Usage Access permission to monitor app usage.")
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         }
 
-        if (!overlayPermissionGranted) {
+        if (!overlayPermissionGranted) { //for Navigating to Anti Smartphone Addiction app if foreground app is Restricted
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Overlay Permission Required")
                     .setMessage("This app needs permission to display a warning screen over restricted apps.")

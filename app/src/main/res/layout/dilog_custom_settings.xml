@@ -22,7 +22,7 @@
                 android:id="@+id/etRestrictAppAfter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Restrict app after (Enter time in ms)"
+                android:hint="Restrict app after (Enter time in hrs)"
                 android:importantForAutofill="no"
                 android:inputType="number"
                 app:startIconDrawable="@drawable/ic_clock"
@@ -57,7 +57,7 @@
                 android:id="@+id/etTemporaryUnlockTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter temporary unlock time (in ms)"
+                android:hint="Enter temporary unlock time (in minutes)"
                 android:importantForAutofill="no"
                 android:inputType="number"
                 tools:ignore="HardcodedText" />
