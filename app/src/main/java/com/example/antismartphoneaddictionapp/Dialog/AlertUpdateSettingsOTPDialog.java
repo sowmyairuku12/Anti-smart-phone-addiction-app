@@ -1,9 +1,13 @@
 package com.example.antismartphoneaddictionapp.Dialog;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Random;
 
 public class AlertUpdateSettingsOTPDialog implements View.OnClickListener {
 
@@ -103,49 +108,50 @@ public class AlertUpdateSettingsOTPDialog implements View.OnClickListener {
     }
 
     private void onClickBtnOk() {
-        long opt = Long.parseLong(etOpt.getText().toString().trim());
-        if (opt == Constants.OPT) {
-            //Update the time in shared pref
-            Constants.updateValues(context, newForegroundCheckTime, newExpiryTime, newTempExpiryTime);
-            dialog.dismiss();
-
-        } else {
-            Toast.makeText(alertView.getContext(), "Incorrect OTP", Toast.LENGTH_SHORT).show();
-        }
-
-
-//        //by using api for sms////
-//        if (Helper.isEmptyFieldValidation(etOpt)) {
-//            String otpText = etOpt.getText().toString().trim();
-//            if (TextUtils.isEmpty(otpText)) {
-//                Toast.makeText(alertView.getContext(), "Please enter OTP", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
+        //for testing
+//        long opt = Long.parseLong(etOpt.getText().toString().trim());
+//        if (opt == Constants.OPT) {
+//            //Update the time in shared pref
+//            Constants.updateValues(context, newForegroundCheckTime, newExpiryTime, newTempExpiryTime);
+//            dialog.dismiss();
 //
-//            int enteredOtp;
-//            try {
-//                enteredOtp = Integer.parseInt(otpText);
-//            } catch (NumberFormatException e) {
-//                Toast.makeText(alertView.getContext(), "Invalid OTP format", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//
-//            // Retrieve OTP from SharedPreferences
-//            SharedPreferences preferences = context.getSharedPreferences("SETTINGS_OTP_PREF", MODE_PRIVATE);
-//            int savedOtp = preferences.getInt("OTP", -1); // Default -1 if OTP is not found
-//
-//            if (enteredOtp == savedOtp) {
-//                // OTP Verified → Update App settings
-//        Constants.updateValues(context, newForegroundCheckTime, newExpiryTime, newTempExpiryTime);
-//
-//                // Clear OTP from SharedPreferences after successful verification
-//                preferences.edit().remove("OTP").apply();
-//                Toast.makeText(alertView.getContext(), "Settings updated successful", Toast.LENGTH_SHORT).show();
-//        dialog.dismiss();
-//            } else {
-//                Toast.makeText(alertView.getContext(), "Incorrect OTP", Toast.LENGTH_SHORT).show();
-//            }
+//        } else {   
+//            Toast.makeText(alertView.getContext(), "Incorrect OTP", Toast.LENGTH_SHORT).show();
 //        }
+
+
+        //by using api for sms////
+        if (Helper.isEmptyFieldValidation(etOpt)) {
+            String otpText = etOpt.getText().toString().trim();
+            if (TextUtils.isEmpty(otpText)) {
+                Toast.makeText(alertView.getContext(), "Please enter OTP", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int enteredOtp;
+            try {
+                enteredOtp = Integer.parseInt(otpText);
+            } catch (NumberFormatException e) {
+                Toast.makeText(alertView.getContext(), "Invalid OTP format", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Retrieve OTP from SharedPreferences
+            SharedPreferences preferences = context.getSharedPreferences("SETTINGS_OTP_PREF", MODE_PRIVATE);
+            int savedOtp = preferences.getInt("OTP", -1); // Default -1 if OTP is not found
+
+            if (enteredOtp == savedOtp) {
+                // OTP Verified → Update App settings
+                Constants.updateValues(context, newForegroundCheckTime, newExpiryTime, newTempExpiryTime);
+
+                // Clear OTP from SharedPreferences after successful verification
+                preferences.edit().remove("OTP").apply();
+                Toast.makeText(alertView.getContext(), "Settings updated successful", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            } else {
+                Toast.makeText(alertView.getContext(), "Incorrect OTP", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void onClickBtnGetOPT() {
@@ -155,18 +161,18 @@ public class AlertUpdateSettingsOTPDialog implements View.OnClickListener {
             etOpt.requestFocus();
 
 
-//            //by using api for sms////
-//            String phoneNumber = etPhoneNumber.getText().toString().trim();
-//
-//            // Generate a random 6-digit OTP
-//            int otp = new Random().nextInt(900000) + 100000;
-//
-//            // Store OTP in SharedPreferences
-//            SharedPreferences preferences = context.getSharedPreferences("SETTINGS_OTP_PREF", MODE_PRIVATE);
-//            preferences.edit().putInt("OTP", otp).apply();
-//
-//            // Send OTP using Fast2SMS API
-//            sendOtpViaSms(phoneNumber, otp);
+            //by using api for sms////
+            String phoneNumber = etPhoneNumber.getText().toString().trim();
+
+            // Generate a random 6-digit OTP
+            int otp = new Random().nextInt(900000) + 100000;
+
+            // Store OTP in SharedPreferences
+            SharedPreferences preferences = context.getSharedPreferences("SETTINGS_OTP_PREF", MODE_PRIVATE);
+            preferences.edit().putInt("OTP", otp).apply();
+
+            // Send OTP using Fast2SMS API
+            sendOtpViaSms(phoneNumber, otp);
         }
     }
 

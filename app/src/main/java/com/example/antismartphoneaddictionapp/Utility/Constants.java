@@ -10,7 +10,7 @@ public class Constants {
 
     public static long FOREGROUND_CHECK_TIME = 7200000; // 2 hours default
     public static int EXPIRY_TIME = 2; // 2 Hours default
-    public static long TEMP_EXPIRY_TIME = 120000; //2 minutes default  //300000 (5 minutes)
+    public static long TEMP_EXPIRY_TIME = 3600000; // 3600000 (1 hour)  //120000 (2 minutes)  //300000 (5 minutes)
 
     public static final long OPT = 1234;
 
@@ -21,7 +21,7 @@ public class Constants {
         // Load saved values or use default ones
         FOREGROUND_CHECK_TIME = sharedPreferences.getLong("FOREGROUND_CHECK_TIME", 7200000);
         EXPIRY_TIME = sharedPreferences.getInt("EXPIRY_TIME", 2);
-        TEMP_EXPIRY_TIME = sharedPreferences.getLong("TEMP_EXPIRY_TIME", 120000);
+        TEMP_EXPIRY_TIME = sharedPreferences.getLong("TEMP_EXPIRY_TIME", 3600000);
     }
 
     public static void updateValues(Context context, long foregroundCheckTime, int expiryTime, long tempExpiryTime) {
