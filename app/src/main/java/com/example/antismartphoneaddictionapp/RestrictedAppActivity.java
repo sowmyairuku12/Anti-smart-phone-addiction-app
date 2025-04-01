@@ -82,40 +82,48 @@ public class RestrictedAppActivity extends AppCompatActivity implements View.OnC
     }
 
     private void onClickBtnOk() {
-        if (Helper.isEmptyFieldValidation(etOpt)) {
-            String otpText = etOpt.getText().toString().trim();
-            if (TextUtils.isEmpty(otpText)) {
-                Toast.makeText(this, "Please enter OTP", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        long opt = Long.parseLong(etOpt.getText().toString().trim());
+        if (opt == Constants.OPT) {
+            //call database method to update the TempUnlockExpiryTime from current date time + 2 min
+            //also create method in db to update TempUnlockExpiryTime where id = ?
+            updateTempUnlockExpiryTime(restrictedAppId);
+        } else {
+            Toast.makeText(this, "Incorrect OTP", Toast.LENGTH_SHORT).show();
 
-            int enteredOtp;
-            try {
-                enteredOtp = Integer.parseInt(otpText);
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "Invalid OTP format", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Retrieve OTP from SharedPreferences
-            SharedPreferences preferences = getSharedPreferences("OTP_PREF", MODE_PRIVATE);
-            int savedOtp = preferences.getInt("OTP", -1); // Default -1 if OTP is not found
-
-            if (enteredOtp == savedOtp) {
-                // OTP Verified → Unlock App
-                updateTempUnlockExpiryTime(restrictedAppId);
-
-                // Clear OTP from SharedPreferences after successful verification
-                preferences.edit().remove("OTP").apply();
-                Toast.makeText(this, "Temporary unlock successful", Toast.LENGTH_SHORT).show();
-
-            } else {
-                Toast.makeText(this, "Incorrect OTP", Toast.LENGTH_SHORT).show();
-            }
         }
-//        Intent intent = new Intent(this, MainActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(intent);
+
+        ////by using api for sms////
+//        if (Helper.isEmptyFieldValidation(etOpt)) {
+//            String otpText = etOpt.getText().toString().trim();
+//            if (TextUtils.isEmpty(otpText)) {
+//                Toast.makeText(this, "Please enter OTP", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//
+//            int enteredOtp;
+//            try {
+//                enteredOtp = Integer.parseInt(otpText);
+//            } catch (NumberFormatException e) {
+//                Toast.makeText(this, "Invalid OTP format", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//
+//            // Retrieve OTP from SharedPreferences
+//            SharedPreferences preferences = getSharedPreferences("OTP_PREF", MODE_PRIVATE);
+//            int savedOtp = preferences.getInt("OTP", -1); // Default -1 if OTP is not found
+//
+//            if (enteredOtp == savedOtp) {
+//                // OTP Verified → Unlock App
+//                updateTempUnlockExpiryTime(restrictedAppId);
+//
+//                // Clear OTP from SharedPreferences after successful verification
+//                preferences.edit().remove("OTP").apply();
+//                Toast.makeText(this, "Temporary unlock successful", Toast.LENGTH_SHORT).show();
+//                finish();
+//            } else {
+//                Toast.makeText(this, "Incorrect OTP", Toast.LENGTH_SHORT).show();
+//            }
+//        }
     }
 
     private void onClickBtnGetOPT() {
@@ -124,17 +132,18 @@ public class RestrictedAppActivity extends AppCompatActivity implements View.OnC
             btnOk.setVisibility(View.VISIBLE);
             etOpt.requestFocus();
 
-            String phoneNumber = etPhoneNumber.getText().toString().trim();
-
-            // Generate a random 6-digit OTP
-            int otp = new Random().nextInt(900000) + 100000;
-
-            // Store OTP in SharedPreferences
-            SharedPreferences preferences = getSharedPreferences("OTP_PREF", MODE_PRIVATE);
-            preferences.edit().putInt("OTP", otp).apply();
-
-            // Send OTP using Fast2SMS API
-            sendOtpViaSms(phoneNumber, otp);
+            ////by using api for sms////
+//            String phoneNumber = etPhoneNumber.getText().toString().trim();
+//
+//            // Generate a random 6-digit OTP
+//            int otp = new Random().nextInt(900000) + 100000;
+//
+//            // Store OTP in SharedPreferences
+//            SharedPreferences preferences = getSharedPreferences("OTP_PREF", MODE_PRIVATE);
+//            preferences.edit().putInt("OTP", otp).apply();
+//
+//            // Send OTP using Fast2SMS API
+//            sendOtpViaSms(phoneNumber, otp);
         }
     }
 
@@ -142,6 +151,7 @@ public class RestrictedAppActivity extends AppCompatActivity implements View.OnC
         // Call the database method to update the TempUnlockExpiryTime
         db.updateTempUnlockExpiryTime(appId);
         Toast.makeText(this, "Temporary unlock successful", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     // Function to send OTP using Fast2SMS API
