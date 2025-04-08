@@ -61,6 +61,8 @@ public class RestrictedAppActivity extends AppCompatActivity implements View.OnC
         if (appName != null) {
             tvAppName.setText("Access to " + appName + " is restricted!"); // Update UI
         }
+
+        etPhoneNumber.setText(Constants.PHONE_NUMBER);
     }
 
     private void initListener() {

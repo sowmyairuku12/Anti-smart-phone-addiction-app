@@ -13,6 +13,7 @@ public class Constants {
     public static long TEMP_EXPIRY_TIME = 3600000; // 3600000 (1 hour)  //120000 (2 minutes)  //300000 (5 minutes)
 
     public static final long OPT = 1234;
+    public static String PHONE_NUMBER = "";
 
     //Methods to update the Share preference with the time
     public static void init(Context context) {
@@ -24,7 +25,7 @@ public class Constants {
         TEMP_EXPIRY_TIME = sharedPreferences.getLong("TEMP_EXPIRY_TIME", 3600000);
     }
 
-    public static void updateValues(Context context, long foregroundCheckTime, int expiryTime, long tempExpiryTime) {
+    public static void updateValues(Context context, long foregroundCheckTime, int expiryTime, long tempExpiryTime, String phoneNumber) {
         // Save new values to SharedPreferences
         sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -32,11 +33,14 @@ public class Constants {
         editor.putLong("FOREGROUND_CHECK_TIME", foregroundCheckTime);
         editor.putInt("EXPIRY_TIME", expiryTime);
         editor.putLong("TEMP_EXPIRY_TIME", tempExpiryTime);
+        editor.putString("PHONE_NUMBER", phoneNumber);
         editor.apply();
 
         // Update constants
         FOREGROUND_CHECK_TIME = foregroundCheckTime;
         EXPIRY_TIME = expiryTime;
         TEMP_EXPIRY_TIME = tempExpiryTime;
+        PHONE_NUMBER = phoneNumber;
+
     }
 }

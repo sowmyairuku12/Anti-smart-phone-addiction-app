@@ -60,7 +60,11 @@
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"
                 android:textCursorDrawable="@color/white"
-                tools:ignore="HardcodedText">
+                tools:ignore="HardcodedText"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:cursorVisible="false"
+                android:clickable="false">
 
                 <requestFocus />
             </com.google.android.material.textfield.TextInputEditText>

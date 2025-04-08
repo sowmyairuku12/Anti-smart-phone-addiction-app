@@ -44,12 +44,14 @@ public class AlertUpdateSettingsOTPDialog implements View.OnClickListener {
     private Context context;
     private long newForegroundCheckTime, newTempExpiryTime;
     private int newExpiryTime;
+    private String phoneNumber;
 
-    public AlertUpdateSettingsOTPDialog(Context context, long foregroundTime, int expiry, long tempTime) {
+    public AlertUpdateSettingsOTPDialog(Context context, long foregroundTime, int expiry, long tempTime, String phoneNumber) {
         this.context = context;
         this.newForegroundCheckTime = foregroundTime;
         this.newExpiryTime = expiry;
         this.newTempExpiryTime = tempTime;
+        this.phoneNumber = phoneNumber;
     }
 
     public Dialog openUpdateSettingsDialog() {
@@ -87,6 +89,8 @@ public class AlertUpdateSettingsOTPDialog implements View.OnClickListener {
         etPhoneNumber = alertView.findViewById(R.id.etPhoneNumber);
         etOpt = alertView.findViewById(R.id.etOpt);
         btnOk = alertView.findViewById(R.id.btnOk);
+        etPhoneNumber.setText(phoneNumber);
+
     }
 
     private void initListener() {
@@ -142,7 +146,7 @@ public class AlertUpdateSettingsOTPDialog implements View.OnClickListener {
 
             if (enteredOtp == savedOtp) {
                 // OTP Verified → Update App settings
-                Constants.updateValues(context, newForegroundCheckTime, newExpiryTime, newTempExpiryTime);
+                Constants.updateValues(context, newForegroundCheckTime, newExpiryTime, newTempExpiryTime, phoneNumber);
 
                 // Clear OTP from SharedPreferences after successful verification
                 preferences.edit().remove("OTP").apply();
