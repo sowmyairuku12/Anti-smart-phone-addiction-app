@@ -23,6 +23,7 @@ public class Constants {
         FOREGROUND_CHECK_TIME = sharedPreferences.getLong("FOREGROUND_CHECK_TIME", 7200000);
         EXPIRY_TIME = sharedPreferences.getInt("EXPIRY_TIME", 2);
         TEMP_EXPIRY_TIME = sharedPreferences.getLong("TEMP_EXPIRY_TIME", 3600000);
+        PHONE_NUMBER = sharedPreferences.getString("PHONE_NUMBER", "");
     }
 
     public static void updateValues(Context context, long foregroundCheckTime, int expiryTime, long tempExpiryTime, String phoneNumber) {
@@ -41,6 +42,11 @@ public class Constants {
         EXPIRY_TIME = expiryTime;
         TEMP_EXPIRY_TIME = tempExpiryTime;
         PHONE_NUMBER = phoneNumber;
+    }
 
+    // Optional: get phone number (can also use PHONE_NUMBER directly)
+    public static String getPhoneNumber(Context context) {
+        sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString("PHONE_NUMBER", "");
     }
 }

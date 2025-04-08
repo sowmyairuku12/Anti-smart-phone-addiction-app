@@ -71,6 +71,7 @@ public class AlertCustomTimeSettingsDialog implements View.OnClickListener {
         etRestrictAppAfter.setText(String.valueOf(Constants.FOREGROUND_CHECK_TIME / 3600000));  //Milliseconds → Hours
         etExpiryTime.setText(String.valueOf(Constants.EXPIRY_TIME));  //In Hours
         etTemporaryUnlockTime.setText(String.valueOf(Constants.TEMP_EXPIRY_TIME / 60000));  //Minutes → Milliseconds
+        etPhoneNumber.setText(String.valueOf(Constants.PHONE_NUMBER));
 
     }
 
