@@ -202,35 +202,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void getUsage() {
+        // Set calendar to today at 12:00 AM
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, -1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
 
         final List<UsageStats> stats =
-                mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST,
+                mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,
                         cal.getTimeInMillis(), System.currentTimeMillis());
+
         ArrayMap<String, UsageStats> map = new ArrayMap<>();
         final int statCount = stats.size();
         for (int i = 0; i < statCount; i++) {
-            final android.app.usage.UsageStats pkgStats = stats.get(i);
+            final UsageStats pkgStats = stats.get(i);
             try {
                 ApplicationInfo appInfo = mPm.getApplicationInfo(pkgStats.getPackageName(), 0);
                 String label = appInfo.loadLabel(mPm).toString();
                 mAppLabelMap.put(pkgStats.getPackageName(), label);
 
-                UsageStats existingStats =
-                        map.get(pkgStats.getPackageName());
+                UsageStats existingStats = map.get(pkgStats.getPackageName());
                 if (existingStats == null) {
                     map.put(pkgStats.getPackageName(), pkgStats);
                 } else {
                     existingStats.add(pkgStats);
                 }
-
             } catch (PackageManager.NameNotFoundException ignored) {
             }
         }
         mPackageStats.addAll(map.values());
         mAppLabelComparator = new AppNameComparator(mAppLabelMap);
     }
+
 
     @SuppressLint("SetTextI18n")
     void showList() {

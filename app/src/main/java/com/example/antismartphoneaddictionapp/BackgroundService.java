@@ -166,8 +166,14 @@ public class BackgroundService extends Service {
     }
 
     void getUsage() {
+//        Calendar cal = Calendar.getInstance();
+//        cal.add(Calendar.DAY_OF_YEAR, -1);
+
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, -1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
 
         List<UsageStats> stats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,
                 cal.getTimeInMillis(), System.currentTimeMillis());
@@ -195,7 +201,7 @@ public class BackgroundService extends Service {
 
     void showList() {
         for (UsageStats pkgStats : mPackageStats) {
-            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > Constants.FOREGROUND_CHECK_TIME) { // 5 minutes
+            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > Constants.FOREGROUND_CHECK_TIME) {
 //            if (pkgStats != null && pkgStats.getTotalTimeInForeground() > 7200000) { // 120 minutes
                 String appName = mAppLabelMap.get(pkgStats.getPackageName()).toUpperCase();
                 List<LocalAppModel> appModels = db.getAllApps();
@@ -317,10 +323,6 @@ public class BackgroundService extends Service {
         intent.putExtra("PACKAGE_NAME", packageName);  // Pass the package name
         intent.putExtra("APP_ID", appId);  // Pass the app ID
         startActivity(intent);
-//        Intent homeIntent = new Intent(Intent.ACTION_MAIN); //to launch the Home of device
-//        homeIntent.addCategory(Intent.CATEGORY_HOME);
-//        homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(homeIntent);
     }
 
     long parseTime(String expiryTime) {
